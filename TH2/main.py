@@ -3,8 +3,7 @@ import threading
 import time
 from datetime import datetime
 
-N = 150
-K = 3
+K = 5
 H = 3
 
 data_lock = threading.Lock()
@@ -29,7 +28,7 @@ def is_prime(n):
 
 def producer(id):
 	while True:
-		time.sleep(random.uniform(0.2, 1.2))
+		time.sleep(random.uniform(0.2, 0.5))
 		value = random.randint(1, 10_000)
 		with data_lock:
 			A.append(value)
@@ -43,18 +42,18 @@ def consumer(id):
 			value = random.choice(A)
 		result = "prime" if is_prime(value) else "not prime"
 		print(f"C{id}: {value} - {result} - {now_str()}")
-		time.sleep(random.uniform(0.2, 1.0))
+		time.sleep(random.uniform(0.2, 0.5))
 
 def main():
 	threads = []
 
-	for i in range(K):
-		t = threading.Thread(target=producer, args=(i + 1,), daemon=True)
+	for i in range(H):
+		t = threading.Thread(target=consumer, args=(i + 1,), daemon=True)
 		threads.append(t)
 		t.start()
 
-	for i in range(H):
-		t = threading.Thread(target=consumer, args=(i + 1,), daemon=True)
+	for i in range(K):
+		t = threading.Thread(target=producer, args=(i + 1,), daemon=True)
 		threads.append(t)
 		t.start()
 
